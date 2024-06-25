@@ -1,0 +1,50 @@
+package com.vincent.stanleyhotel.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.cglib.core.Block;
+
+import java.math.BigDecimal;
+import java.sql.Blob;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+@Entity
+@Getter
+@Setter
+@AllArgsConstructor
+public class Room {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String roomType;
+    private BigDecimal roomPrice;
+    private boolean isBooked = false;
+
+    @Lob // This annotation is typically used for storing large amounts of binary or character data in a database.
+    private Blob photo; // Blob(Binary Large Object) is a data type used to store large amounts of binary data, such as images, videos, or other types of files.
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // When this room is deleted, all booked rooms are deleted.
+    private List<BookedRoom> bookings;
+
+    public Room() {
+        this.bookings = new ArrayList<>();
+    }
+
+    public void addBookings(BookedRoom booking) {
+        if (bookings == null) {
+            bookings = new ArrayList<>();
+        }
+        bookings.add(booking);
+        booking.setRoom(this);
+        isBooked = true;
+        String bookingCode = RandomStringUtils.randomNumeric(10);
+        booking.setBookingConfirmationCode(bookingCode);
+    }
+}
