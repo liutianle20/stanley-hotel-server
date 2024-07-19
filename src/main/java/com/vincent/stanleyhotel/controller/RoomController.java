@@ -4,22 +4,22 @@ import com.vincent.stanleyhotel.exception.PhotoRetrievalException;
 import com.vincent.stanleyhotel.exception.ResourceNotFoundException;
 import com.vincent.stanleyhotel.model.BookedRoom;
 import com.vincent.stanleyhotel.model.Room;
-import com.vincent.stanleyhotel.response.BookingResponse;
 import com.vincent.stanleyhotel.response.RoomResponse;
 import com.vincent.stanleyhotel.service.IBookedRoomService;
 import com.vincent.stanleyhotel.service.IRoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sql.rowset.serial.SerialBlob;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -97,8 +97,32 @@ public class RoomController {
         }).orElseThrow(() -> new ResourceNotFoundException("Room not found"));
     }
 
+    @GetMapping("/available-rooms")
+    public ResponseEntity<List<RoomResponse>> getAvailableRooms(
+            @RequestParam("checkInDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
+            @RequestParam("checkOutDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
+            @RequestParam("roomType") String roomType) throws SQLException {
+        List<Room> availableRooms = roomService.getAvailableRooms(checkInDate, checkOutDate, roomType);
+        List<RoomResponse> availableRoomResponses = new ArrayList<>();
+        for (Room room : availableRooms) {
+            byte[] photoBytes = roomService.getRoomPhotoById(room.getId());
+            if (photoBytes != null && photoBytes.length > 0) {
+                String photoBase64 = Base64.getEncoder().encodeToString(photoBytes);
+                RoomResponse roomResponse = getRoomResponse(room);
+                roomResponse.setPhoto(photoBase64);
+                availableRoomResponses.add(roomResponse);
+            }
+        }
+        if (availableRoomResponses.isEmpty()) {
+            return ResponseEntity. noContent().build();
+        } else {
+            return ResponseEntity.ok(availableRoomResponses);
+        }
+    }
+
+
     private RoomResponse getRoomResponse(Room room) {
-        List<BookedRoom> bookedRooms = getAllBookedRoomsById(room.getId());
+//        List<BookedRoom> bookedRooms = getAllBookedRoomsById(room.getId());
 //        List<BookingResponse> bookingResponses = bookedRooms.stream()
 //                .map(bookedRoom -> new BookingResponse(bookedRoom.getBookingId(),
 //                        bookedRoom.getCheckInDate(),

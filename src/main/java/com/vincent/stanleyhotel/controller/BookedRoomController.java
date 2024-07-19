@@ -6,7 +6,6 @@ import com.vincent.stanleyhotel.model.BookedRoom;
 import com.vincent.stanleyhotel.model.Room;
 import com.vincent.stanleyhotel.response.BookingResponse;
 import com.vincent.stanleyhotel.response.RoomResponse;
-import com.vincent.stanleyhotel.service.BookedRoomServiceImpl;
 import com.vincent.stanleyhotel.service.IBookedRoomService;
 import com.vincent.stanleyhotel.service.IRoomService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @CrossOrigin("http://localhost:5173")

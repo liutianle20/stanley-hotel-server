@@ -23,4 +23,6 @@ public interface IRoomService {
     Room updateRoom(Long id, String roomType, BigDecimal roomPrice, byte[] photoBytes);
 
     Optional<Room> getRoomById(Long id);
+
+    List<Room> getAvailableRooms(java.time.LocalDate checkInDate, java.time.LocalDate checkOutDate, String roomType);
 }

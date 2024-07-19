@@ -1,6 +1,7 @@
 package com.vincent.stanleyhotel.service;
 
 import com.vincent.stanleyhotel.exception.InvalidBookingRequestException;
+import com.vincent.stanleyhotel.exception.ResourceNotFoundException;
 import com.vincent.stanleyhotel.model.BookedRoom;
 import com.vincent.stanleyhotel.model.Room;
 import com.vincent.stanleyhotel.repository.BookedRoomRepository;
@@ -51,7 +52,8 @@ public class BookedRoomServiceImpl implements IBookedRoomService {
 
     @Override
     public BookedRoom findByBookedRoomConfirmationCode(String confirmationCode) {
-        return bookedRoomRepository.findByBookingConfirmationCode(confirmationCode);
+        return bookedRoomRepository.findByBookingConfirmationCode(confirmationCode)
+                .orElseThrow(() -> new ResourceNotFoundException("No booking found for confirmation code " + confirmationCode));
     }
 
     private boolean roomIsAvailable(BookedRoom bookingRequest, List<BookedRoom> existingBookings) {
