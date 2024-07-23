@@ -24,6 +24,11 @@ public class BookedRoomServiceImpl implements IBookedRoomService {
     }
 
     @Override
+    public List<BookedRoom> getBookingsByEmail(String email) {
+        return bookedRoomRepository.findByGuestEmail(email);
+    }
+
+    @Override
     public List<BookedRoom> getAllBookedRoomsById(Long roomId) {
         return bookedRoomRepository.findByRoomId(roomId);
     }

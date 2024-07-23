@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +26,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin("http://localhost:5173")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rooms")
@@ -36,6 +36,7 @@ public class RoomController {
     private final IBookedRoomService bookedRoomService;
 
     @PostMapping("/add/new-room")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomResponse> addRoom(
             @RequestParam("photo") MultipartFile photo,
             @RequestParam("roomType") String roomType,
@@ -67,12 +68,15 @@ public class RoomController {
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/delete-room/{id}")
     public ResponseEntity<Void> deleteRoom(@PathVariable("id") Long id) throws SQLException {
         roomService.deleteRoom(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/update-room/{id}")
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long id,
                                                    @RequestParam(required = false) String roomType, // indicates that a method parameter should be bound to a web request parameter. The required = false attribute indicates that the parameter is optional.

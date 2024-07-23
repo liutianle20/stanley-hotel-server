@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-@CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/bookings")
@@ -66,6 +65,16 @@ public class BookedRoomController  {
         bookedRoomService.cancelBookedRoom(bookingId);
     }
 
+    @GetMapping("/user/{email}")
+    public ResponseEntity<List<BookingResponse>> getBookingsByEmail(@PathVariable String email) {
+        List<BookedRoom> bookings = bookedRoomService.getBookingsByEmail(email);
+        List<BookingResponse> bookingResponses = new ArrayList<>();
+        for (BookedRoom bookedRoom : bookings) {
+            BookingResponse bookingResponse = getBookingResponse(bookedRoom);
+            bookingResponses.add(bookingResponse);
+        }
+        return ResponseEntity.ok(bookingResponses);
+    }
 
     private BookingResponse getBookingResponse(BookedRoom bookedRoom) {
         Room theRoom = roomService.getRoomById(bookedRoom.getRoom().getId()).get();
